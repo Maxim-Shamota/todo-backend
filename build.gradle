@@ -2,11 +2,15 @@ plugins {
     id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10' // для корректной компиляции kotlin классов для jvm
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.6.10' // для корректного создания spring бинов из котлин классов
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.6.10' // для корректной работы hibernate/jpa с kotlin
+    id 'org.jetbrains.kotlin.plugin.allopen' version '1.6.10' // делает все классы kotlin - open, а не final
 }
 
 group = 'site.shamota.backend.todo'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '1.8'
 
 configurations {
     compileOnly {
@@ -32,4 +36,18 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     runtimeOnly 'org.postgresql:postgresql'
+
+    implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8')
+    implementation('org.jetbrains.kotlin:kotlin-reflect')
+    implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }

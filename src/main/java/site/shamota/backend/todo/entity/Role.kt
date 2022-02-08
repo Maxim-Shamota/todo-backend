@@ -1,61 +1,52 @@
-package site.shamota.backend.todo.entity;
+package site.shamota.backend.todo.entity
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import javax.persistence.*;
-import java.util.Objects;
-import java.util.Set;
+import lombok.NoArgsConstructor
+import lombok.AllArgsConstructor
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import com.fasterxml.jackson.annotation.JsonProperty
+import lombok.Getter
+import lombok.Setter
+import org.hibernate.annotations.Cache
+import java.util.Objects
+import javax.persistence.*
 
 /*
 
 Все доступные роли, которые будут привязаны к пользователю
 
 */
-
-
 @Entity
 @Table(name = "role_data", schema = "todolist", catalog = "todo-backend")
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-@Getter
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class Role {
+class Role {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+     val id: Long? = null
 
-	private String name; // название роли
+     val name: String? = null // название роли
 
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_role",
-			joinColumns = @JoinColumn(name = "role_id"),
-			inverseJoinColumns = @JoinColumn(name = "user_id"))
-	private Set<User> users;
+//    @JvmField
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "user_role",
+        joinColumns = [JoinColumn(name = "role_id")],
+        inverseJoinColumns = [JoinColumn(name = "user_id")]
+    )
+    val users: Set<User>? = null
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Role role = (Role) o;
-		return id.equals(role.id);
-	}
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o == null || javaClass != o.javaClass) return false
+        val role = o as Role
+        return id == role.id
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
+    override fun hashCode(): Int {
+        return Objects.hash(id)
+    }
 
-	@Override
-	public String toString() {
-		return name;
-	}
+    override fun toString(): String {
+        return name!!
+    }
 }

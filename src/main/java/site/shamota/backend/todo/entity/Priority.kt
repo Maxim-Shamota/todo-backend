@@ -1,14 +1,14 @@
-package site.shamota.backend.todo.entity;
+package site.shamota.backend.todo.entity
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import javax.persistence.*;
-import java.util.Objects;
+import lombok.NoArgsConstructor
+import lombok.AllArgsConstructor
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import com.fasterxml.jackson.annotation.JsonProperty
+import lombok.Getter
+import lombok.Setter
+import org.hibernate.annotations.Cache
+import java.util.Objects
+import javax.persistence.*
 
 /*
 
@@ -16,47 +16,36 @@ import java.util.Objects;
 может использовать для своих задач
 
  */
-
-
 @Entity
 @Table(name = "priority", schema = "todolist", catalog = "todo-backend")
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-@Getter
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Priority {
-
+class Priority {
     // указываем, что поле заполняется в БД
     // нужно, когда добавляем новый объект и он возвращается уже с новым id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Long id;
+    val id: Long? = null
 
-    private String title;
-    private String color;
+    val title: String? = null
+
+    val color: String? = null
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id") // по каким полям связывать (foreign key)
-    private User user;
+    val user: User? = null
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Priority priority = (Priority) o;
-        return id.equals(priority.id);
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o == null || javaClass != o.javaClass) return false
+        val priority = o as Priority
+        return id == priority.id
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    override fun hashCode(): Int {
+        return Objects.hash(id)
     }
 
-    @Override
-    public String toString() {
-        return title;
+    override fun toString(): String {
+        return title!!
     }
 }

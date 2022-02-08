@@ -1,19 +1,12 @@
-package site.shamota.backend.todo.controller;
+package site.shamota.backend.todo.controller
 
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import site.shamota.backend.todo.entity.Category;
-import site.shamota.backend.todo.entity.Priority;
-import site.shamota.backend.todo.search.CategorySearchValues;
-import site.shamota.backend.todo.search.PrioritySearchValues;
-import site.shamota.backend.todo.service.CategoryService;
-import site.shamota.backend.todo.service.PriorityService;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
+import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import site.shamota.backend.todo.entity.Priority
+import site.shamota.backend.todo.search.PrioritySearchValues
+import site.shamota.backend.todo.service.PriorityService
 
 /*
 
@@ -21,94 +14,93 @@ import java.util.NoSuchElementException;
 иначе пришлось бы добавлять лишние объекты в код, использовать @ResponseBody для ответа, указывать тип отправки JSON
 
 */
-
 @RestController
 @RequestMapping("/priority") // базовый URI
-public class PriorityController {
-
-    private PriorityService priorityService;
-
-    public PriorityController(PriorityService priorityService) {
-        this.priorityService = priorityService;
-    }
+class PriorityController(
+    private val priorityService: PriorityService // доступ к данным из БД
+) {
 
     @PostMapping("/all")
-    public List<Priority> findAll(@RequestBody String email) {
-        return priorityService.findAll(email);
+    fun findAll(@RequestBody email: String): List<Priority> {
+        return priorityService.findAll(email)
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Priority> add(@RequestBody Priority priority) {
+    fun add(@RequestBody priority: Priority): ResponseEntity<Any> {
 
         // проверка на обязательные параметры
-        if (priority.getId() != null && priority.getId() != 0) { // это означает, что id заполнено
+        if (priority.id != null && priority.id != 0L) { // это означает, что id заполнено
             // id создается автоматически в БД (autoincrement), поэтому его передавать не нужно, иначе может быть конфликт уникальности значения
-            return new ResponseEntity("redundant param: id MUST be null", HttpStatus.NOT_ACCEPTABLE);
+            return ResponseEntity<Any>("redundant param: id MUST be null", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // если передали пустое значение title
-        if (priority.getTitle() == null || priority.getTitle().trim().length() == 0) {
-            return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
+        if (priority.title == null || priority.title.trim().isEmpty()) {
+            return ResponseEntity<Any>("missed param: title", HttpStatus.NOT_ACCEPTABLE)
         }
 
-        return ResponseEntity.ok(priorityService.add(priority)); // возвращаем добавленный объект с заполненным ID
+        //если передали пустое значение color
+        if (priority.color == null || priority.color.trim().isEmpty()) {
+            return ResponseEntity<Any>("missed param: color", HttpStatus.NOT_ACCEPTABLE)
+        }
+
+        return ResponseEntity.ok(priorityService.add(priority))
     }
 
     @PutMapping("/update")
-    public ResponseEntity update(@RequestBody Priority priority) {
+    fun update(@RequestBody priority: Priority): ResponseEntity<*> {
 
         // проверка на обязательные параметры
-        if (priority.getId() == null && priority.getId() == 0) {
-            return new ResponseEntity("missed param: id", HttpStatus.NOT_ACCEPTABLE);
+        if (priority.id == null || priority.id == 0L) {
+            return ResponseEntity<Any>("missed param: id", HttpStatus.NOT_ACCEPTABLE)
         }
 
         // если передали пустое значение title
-        if (priority.getTitle() == null || priority.getTitle().trim().length() == 0) {
-            return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
+        if (priority.title == null || priority.title.trim().isEmpty()) {
+            return ResponseEntity<Any>("missed param: title", HttpStatus.NOT_ACCEPTABLE)
         }
 
-        priorityService.update(priority);
+        //если передали пустое значение color
+        if (priority.color == null || priority.color.trim().isEmpty()) {
+            return ResponseEntity<Any>("missed param: color", HttpStatus.NOT_ACCEPTABLE)
+        }
 
-        return new ResponseEntity(HttpStatus.OK); // просто отправляем статус 200 (операция прошла успешно)
+        priorityService.update(priority)
+        return ResponseEntity<Any>(HttpStatus.OK) // просто отправляем статус 200 (операция прошла успешно)
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity delete(@PathVariable("id") Long id) {
+    fun delete(@PathVariable("id") id: Long): ResponseEntity<Any> {
         try {
-            priorityService.deleteById(id);
-        } catch (EmptyResultDataAccessException e) {
-            e.printStackTrace();
-            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+            priorityService.deleteById(id)
+        } catch (e: EmptyResultDataAccessException) {
+            e.printStackTrace()
+            return ResponseEntity<Any>("id=$id not found", HttpStatus.NOT_ACCEPTABLE)
         }
-
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity<Any>(HttpStatus.OK)
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues) {
+    fun search(@RequestBody prioritySearchValues: PrioritySearchValues): ResponseEntity<Any> {
 
         // проверка на обязательные параметры
-        if (prioritySearchValues.getEmail() == null && prioritySearchValues.getEmail().trim().length()== 0) {
-            return new ResponseEntity("missed param: email", HttpStatus.NOT_ACCEPTABLE);
+        if (prioritySearchValues.email == null || prioritySearchValues.email.trim().isEmpty()) {
+            return ResponseEntity<Any>("missed param: email", HttpStatus.NOT_ACCEPTABLE)
         }
 
-        // поиск категорий пользователя по названию
-        List<Priority> list = priorityService.find(prioritySearchValues.getTitle(), prioritySearchValues.getEmail());
-
-        return ResponseEntity.ok(list);
+        // если вместо текста будет пусто или null - вернутся все категории
+        return ResponseEntity.ok(priorityService.find(prioritySearchValues.title, prioritySearchValues.email))
     }
 
     @PostMapping("/id")
-    public ResponseEntity<Priority> findById(@RequestBody Long id) {
-        Priority priority = null;
+    fun findById(@RequestBody id: Long): ResponseEntity<Any> {
 
-        try {
-            priority = priorityService.findById(id);
-        } catch (NoSuchElementException e) {
-            e.printStackTrace();
-            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+        var priority: Priority? = try {
+            priorityService.findById(id)
+        } catch (e: NoSuchElementException) {
+            e.printStackTrace()
+            return ResponseEntity<Any>("id=$id not found", HttpStatus.NOT_ACCEPTABLE)
         }
-
-        return ResponseEntity.ok(priority);
+        return ResponseEntity.ok(priority)
     }
 }

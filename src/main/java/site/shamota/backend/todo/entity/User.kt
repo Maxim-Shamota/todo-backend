@@ -1,6 +1,14 @@
-package site.shamota.backend.todo.entity;
+package site.shamota.backend.todo.entity
 
-
+import lombok.AllArgsConstructor
+import lombok.NoArgsConstructor
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import com.fasterxml.jackson.annotation.JsonProperty
+import lombok.Getter
+import lombok.Setter
+import org.hibernate.annotations.Cache
+import java.util.Objects
+import javax.persistence.*
 
 /*
 
@@ -8,58 +16,36 @@ package site.shamota.backend.todo.entity;
 
  */
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import javax.persistence.*;
-import java.util.Objects;
-import java.util.Set;
-
 @Entity
 @Table(name = "user_data", schema = "todolist", catalog = "todo-backend")
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class User {
-
+class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    val id: Long? = null
 
-    private String email;
+    val email: String? = null
 
-    private String username;
+    val username: String? = null
 
     @Column(name = "userpassword")
-    private String password;
+    val password: String? = null
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
-    private Set<Role> roles;
+    val roles: Set<Role>? = null
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id.equals(user.id);
+    override fun equals(o: Any?): Boolean {
+        if (this === o) return true
+        if (o == null || javaClass != o.javaClass) return false
+        val user = o as User
+        return id == user.id
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    override fun hashCode(): Int {
+        return Objects.hash(id)
     }
 
-    @Override
-    public String toString() {
-        return username;
+    override fun toString(): String {
+        return username!!
     }
 }

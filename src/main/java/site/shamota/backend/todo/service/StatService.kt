@@ -1,21 +1,14 @@
-package site.shamota.backend.todo.service;
+package site.shamota.backend.todo.service
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import site.shamota.backend.todo.entity.Stat;
-import site.shamota.backend.todo.repo.StatRepository;
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import site.shamota.backend.todo.repo.StatRepository
+import site.shamota.backend.todo.entity.Stat
 
 @Service
 @Transactional
-public class StatService {
-
-    private final StatRepository repository;
-
-    public StatService(StatRepository repository) {
-        this.repository = repository;
-    }
-
-    public Stat findStat(String email) {
-        return repository.findByUserEmail(email);
+class StatService(private val repository: StatRepository) {
+    fun findStat(email: String): Stat {
+        return repository.findByUserEmail(email)
     }
 }
